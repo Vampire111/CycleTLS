@@ -46,6 +46,8 @@ type respData struct {
 	Status  int
 	Body    string
 	Headers map[string]string
+	Url     string
+	Cookies []*Cookie
 }
 
 //Response contains Cycletls response data
@@ -115,7 +117,7 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		parsedError := parseError(err)
 
 		headers := make(map[string]string)
-		respData := respData{parsedError.StatusCode, parsedError.ErrorMsg + "-> \n" + string(err.Error()), headers}
+		respData := respData{Status: parsedError.StatusCode, Body: parsedError.ErrorMsg + "-> \n" + string(err.Error()), Headers: headers}
 
 		return Response{res.options.RequestID, respData}, nil //normally return error here
 		// return response, err
@@ -126,6 +128,21 @@ func dispatcher(res fullRequest) (response Response, err error) {
 	if err != nil {
 		log.Print("Parse Bytes" + err.Error())
 		return response, err
+	}
+
+	response.Response.Url = res.req.URL.String()
+
+	for _, httpCookie := range resp.Cookies() {
+		response.Response.Cookies = append(response.Response.Cookies, &Cookie{
+			Name:     httpCookie.Name,
+			Value:    httpCookie.Value,
+			Path:     httpCookie.Path,
+			Domain:   httpCookie.Domain,
+			Expires:  httpCookie.Expires,
+			MaxAge:   httpCookie.MaxAge,
+			Secure:   httpCookie.Secure,
+			HTTPOnly: httpCookie.HttpOnly,
+		})
 	}
 
 	headers := make(map[string]string)
@@ -140,7 +157,7 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		}
 	}
 
-	respData := respData{resp.StatusCode, string(bodyBytes), headers}
+	respData := respData{Status: resp.StatusCode, Body: string(bodyBytes), Headers: headers}
 
 	return Response{res.options.RequestID, respData}, nil
 
