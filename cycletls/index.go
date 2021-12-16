@@ -130,10 +130,10 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		return response, err
 	}
 
-	response.Response.Url = res.req.URL.String()
+	var cookies []*Cookie
 
 	for _, httpCookie := range resp.Cookies() {
-		response.Response.Cookies = append(response.Response.Cookies, &Cookie{
+		cookies = append(cookies, &Cookie{
 			Name:     httpCookie.Name,
 			Value:    httpCookie.Value,
 			Path:     httpCookie.Path,
@@ -157,7 +157,13 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		}
 	}
 
-	respData := respData{Status: resp.StatusCode, Body: string(bodyBytes), Headers: headers}
+	respData := respData{
+		Status:  resp.StatusCode,
+		Body:    string(bodyBytes),
+		Headers: headers,
+		Cookies: cookies,
+		Url:     res.req.URL.String(),
+	}
 
 	return Response{res.options.RequestID, respData}, nil
 
