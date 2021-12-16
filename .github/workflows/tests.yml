@@ -1,37 +1,37 @@
-name: "Tests"
+name: 'Tests'
 
 on: [push, pull_request]
 
 jobs:
-  release:
-    name: Run general NPM unit and itegration tests
+    release:
+        name: Run general NPM unit and itegration tests
 
-    strategy:
-      matrix:
-        node-version: [14.x]
-        platform: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: 🟢 Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: "https://registry.npmjs.org"
+        strategy:
+            matrix:
+                node-version: [14.x]
+                platform: [ubuntu-latest, macos-latest, windows-latest]
+        runs-on: ${{ matrix.platform }}
+        steps:
+            - uses: actions/checkout@v2
+            - name: 🟢 Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  registry-url: 'https://registry.npmjs.org'
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go-version }}
+            - name: Set up Go
+              uses: actions/setup-go@v2
+              with:
+                  go-version: ${{ matrix.go-version }}
 
-      - name: Install golang dependencies
-        run: go get github.com/Danny-Dasilva/CycleTLS/cycletls && go get gitlab.com/yawning/utls.git
-        working-directory: ./
+            - name: Install golang dependencies
+              run: go get github.com/Skyuzii/CycleTLS/cycletls && go get gitlab.com/yawning/utls.git
+              working-directory: ./
 
-      - name: Install npm depencencies
-        run: npm ci
-        working-directory: ./
+            - name: Install npm depencencies
+              run: npm ci
+              working-directory: ./
 
-      - name: Run Tests
-        run: npm test
-        working-directory: ./
+            - name: Run Tests
+              run: npm test
+              working-directory: ./
