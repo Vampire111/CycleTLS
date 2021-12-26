@@ -28,9 +28,10 @@ type roundTripper struct {
 	JA3       string
 	UserAgent string
 
-	Cookies           []Cookie
-	cachedConnections map[string]net.Conn
-	cachedTransports  map[string]http.RoundTripper
+	InsecureSkipVerify bool
+	Cookies            []Cookie
+	cachedConnections  map[string]net.Conn
+	cachedTransports   map[string]http.RoundTripper
 
 	dialer proxy.ContextDialer
 }
@@ -111,7 +112,7 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 		return nil, err
 	}
 
-	conn := utls.UClient(rawConn, &utls.Config{ServerName: host, InsecureSkipVerify: true}, // MinVersion:         tls.VersionTLS10,
+	conn := utls.UClient(rawConn, &utls.Config{ServerName: host, InsecureSkipVerify: rt.InsecureSkipVerify}, // MinVersion:         tls.VersionTLS10,
 		// MaxVersion:         tls.VersionTLS12, // Default is TLS13
 		utls.HelloCustom)
 	if err := conn.ApplyPreset(spec); err != nil {
@@ -170,22 +171,24 @@ func newRoundTripper(browser browser, dialer ...proxy.ContextDialer) http.RoundT
 		return &roundTripper{
 			dialer: dialer[0],
 
-			JA3:               browser.JA3,
-			UserAgent:         browser.UserAgent,
-			Cookies:           browser.Cookies,
-			cachedTransports:  make(map[string]http.RoundTripper),
-			cachedConnections: make(map[string]net.Conn),
+			InsecureSkipVerify: browser.InsecureSkipVerify,
+			JA3:                browser.JA3,
+			UserAgent:          browser.UserAgent,
+			Cookies:            browser.Cookies,
+			cachedTransports:   make(map[string]http.RoundTripper),
+			cachedConnections:  make(map[string]net.Conn),
 		}
 	}
 
 	return &roundTripper{
 		dialer: proxy.Direct,
 
-		JA3:               browser.JA3,
-		UserAgent:         browser.UserAgent,
-		Cookies:           browser.Cookies,
-		cachedTransports:  make(map[string]http.RoundTripper),
-		cachedConnections: make(map[string]net.Conn),
+		InsecureSkipVerify: browser.InsecureSkipVerify,
+		JA3:                browser.JA3,
+		UserAgent:          browser.UserAgent,
+		Cookies:            browser.Cookies,
+		cachedTransports:   make(map[string]http.RoundTripper),
+		cachedConnections:  make(map[string]net.Conn),
 	}
 }
 

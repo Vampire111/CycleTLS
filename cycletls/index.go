@@ -17,16 +17,17 @@ import (
 
 // Options sets CycleTLS client options
 type Options struct {
-	URL             string            `json:"url"`
-	Method          string            `json:"method"`
-	Headers         map[string]string `json:"headers"`
-	Body            string            `json:"body"`
-	Ja3             string            `json:"ja3"`
-	UserAgent       string            `json:"userAgent"`
-	Proxy           string            `json:"proxy"`
-	Cookies         []Cookie          `json:"cookies"`
-	Timeout         int               `json:"timeout"`
-	DisableRedirect bool              `json:"disableRedirect"`
+	InsecureSkipVerify bool              `json:"insecureSkipVerify"`
+	URL                string            `json:"url"`
+	Method             string            `json:"method"`
+	Headers            map[string]string `json:"headers"`
+	Body               string            `json:"body"`
+	Ja3                string            `json:"ja3"`
+	UserAgent          string            `json:"userAgent"`
+	Proxy              string            `json:"proxy"`
+	Cookies            []Cookie          `json:"cookies"`
+	Timeout            int               `json:"timeout"`
+	DisableRedirect    bool              `json:"disableRedirect"`
 }
 
 type cycleTLSRequest struct {
@@ -81,9 +82,10 @@ func getWebsocketAddr() string {
 func processRequest(request cycleTLSRequest) (result fullRequest) {
 
 	var browser = browser{
-		JA3:       request.Options.Ja3,
-		UserAgent: request.Options.UserAgent,
-		Cookies:   request.Options.Cookies,
+		InsecureSkipVerify: request.Options.InsecureSkipVerify,
+		JA3:                request.Options.Ja3,
+		UserAgent:          request.Options.UserAgent,
+		Cookies:            request.Options.Cookies,
 	}
 
 	client, err := newClient(
