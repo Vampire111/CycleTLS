@@ -174,7 +174,6 @@ func newRoundTripper(browser browser, dialer ...proxy.ContextDialer) http.RoundT
 			InsecureSkipVerify: browser.InsecureSkipVerify,
 			JA3:                browser.JA3,
 			UserAgent:          browser.UserAgent,
-			Cookies:            browser.Cookies,
 			cachedTransports:   make(map[string]http.RoundTripper),
 			cachedConnections:  make(map[string]net.Conn),
 		}
@@ -186,7 +185,6 @@ func newRoundTripper(browser browser, dialer ...proxy.ContextDialer) http.RoundT
 		InsecureSkipVerify: browser.InsecureSkipVerify,
 		JA3:                browser.JA3,
 		UserAgent:          browser.UserAgent,
-		Cookies:            browser.Cookies,
 		cachedTransports:   make(map[string]http.RoundTripper),
 		cachedConnections:  make(map[string]net.Conn),
 	}

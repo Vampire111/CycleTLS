@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"runtime"
@@ -25,9 +26,9 @@ type Options struct {
 	Ja3                string            `json:"ja3"`
 	UserAgent          string            `json:"userAgent"`
 	Proxy              string            `json:"proxy"`
-	Cookies            []Cookie          `json:"cookies"`
 	Timeout            int               `json:"timeout"`
 	DisableRedirect    bool              `json:"disableRedirect"`
+	CookiesJar         *cookiejar.Jar    `json:"cookiesJar"`
 }
 
 type cycleTLSRequest struct {
@@ -48,7 +49,6 @@ type respData struct {
 	Body    string
 	Headers map[string]string
 	Url     string
-	Cookies []*Cookie
 }
 
 //Response contains Cycletls response data
@@ -85,7 +85,7 @@ func processRequest(request cycleTLSRequest) (result fullRequest) {
 		InsecureSkipVerify: request.Options.InsecureSkipVerify,
 		JA3:                request.Options.Ja3,
 		UserAgent:          request.Options.UserAgent,
-		Cookies:            request.Options.Cookies,
+		CookieJar:          request.Options.CookiesJar,
 	}
 
 	client, err := newClient(
@@ -132,21 +132,6 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		return response, err
 	}
 
-	var cookies []*Cookie
-
-	for _, httpCookie := range resp.Cookies() {
-		cookies = append(cookies, &Cookie{
-			Name:     httpCookie.Name,
-			Value:    httpCookie.Value,
-			Path:     httpCookie.Path,
-			Domain:   httpCookie.Domain,
-			Expires:  httpCookie.Expires,
-			MaxAge:   httpCookie.MaxAge,
-			Secure:   httpCookie.Secure,
-			HTTPOnly: httpCookie.HttpOnly,
-		})
-	}
-
 	headers := make(map[string]string)
 
 	for name, values := range resp.Header {
@@ -163,7 +148,6 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		Status:  resp.StatusCode,
 		Body:    string(bodyBytes),
 		Headers: headers,
-		Cookies: cookies,
 		Url:     res.req.URL.String(),
 	}
 
