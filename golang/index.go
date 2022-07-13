@@ -46,6 +46,7 @@ type respData struct {
 	Status  int
 	Body    string
 	Headers map[string]string
+	Url     string
 }
 
 //Response contains Cycletls response data
@@ -110,17 +111,19 @@ func processRequest(request cycleTLSRequest) (result fullRequest) {
 
 func dispatcher(res fullRequest) (response Response, err error) {
 	resp, err := res.client.Do(res.req)
+	url := resp.Request.URL.String()
 	if err != nil {
 
 		parsedError := parseError(err)
 
 		headers := make(map[string]string)
-		respData := respData{parsedError.StatusCode, parsedError.ErrorMsg + "-> \n" + string(err.Error()), headers}
+		respData := respData{parsedError.StatusCode, parsedError.ErrorMsg + "-> \n" + string(err.Error()), headers, url}
 
 		return Response{res.options.RequestID, respData}, nil //normally return error here
 		// return response, err
 
 	}
+	resp.Request.URL.String()
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -140,7 +143,7 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		}
 	}
 
-	respData := respData{resp.StatusCode, string(bodyBytes), headers}
+	respData := respData{resp.StatusCode, string(bodyBytes), headers, url}
 
 	return Response{res.options.RequestID, respData}, nil
 
