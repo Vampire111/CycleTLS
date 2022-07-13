@@ -123,7 +123,7 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		// return response, err
 
 	}
-	resp.Request.URL.String()
+
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

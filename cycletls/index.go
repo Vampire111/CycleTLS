@@ -148,7 +148,7 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		Status:  resp.StatusCode,
 		Body:    string(bodyBytes),
 		Headers: headers,
-		Url:     res.req.URL.String(),
+		Url:     resp.Request.URL.String(),
 	}
 
 	return Response{res.options.RequestID, respData}, nil
