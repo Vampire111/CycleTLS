@@ -47,7 +47,7 @@ type fullRequest struct {
 //TODO: rename this response struct
 type respData struct {
 	Status     int
-	BodyReader io.ReadCloser
+	BodyReader io.Reader
 	Body       string
 	Headers    map[string]string
 	Url        string
