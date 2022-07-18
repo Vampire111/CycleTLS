@@ -3,6 +3,7 @@ package cycletls
 import (
 	"encoding/json"
 	"flag"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,10 +46,11 @@ type fullRequest struct {
 
 //TODO: rename this response struct
 type respData struct {
-	Status  int
-	Body    string
-	Headers map[string]string
-	Url     string
+	Status     int
+	BodyReader io.ReadCloser
+	Body       string
+	Headers    map[string]string
+	Url        string
 }
 
 //Response contains Cycletls response data
@@ -125,7 +127,7 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		// return response, err
 
 	}
-	defer resp.Body.Close()
+
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Print("Parse Bytes" + err.Error())
@@ -145,10 +147,11 @@ func dispatcher(res fullRequest) (response Response, err error) {
 	}
 
 	respData := respData{
-		Status:  resp.StatusCode,
-		Body:    string(bodyBytes),
-		Headers: headers,
-		Url:     resp.Request.URL.String(),
+		Status:     resp.StatusCode,
+		BodyReader: resp.Body,
+		Body:       string(bodyBytes),
+		Headers:    headers,
+		Url:        resp.Request.URL.String(),
 	}
 
 	return Response{res.options.RequestID, respData}, nil
