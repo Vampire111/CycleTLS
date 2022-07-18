@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
@@ -128,12 +127,6 @@ func dispatcher(res fullRequest) (response Response, err error) {
 
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Print("Parse Bytes" + err.Error())
-		return response, err
-	}
-
 	headers := make(map[string]string)
 
 	for name, values := range resp.Header {
@@ -149,7 +142,6 @@ func dispatcher(res fullRequest) (response Response, err error) {
 	respData := respData{
 		Status:     resp.StatusCode,
 		BodyReader: resp.Body,
-		Body:       string(bodyBytes),
 		Headers:    headers,
 		Url:        resp.Request.URL.String(),
 	}
