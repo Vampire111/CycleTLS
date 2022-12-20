@@ -1,4 +1,4 @@
-module github.com/Skyuzii/CycleTLS/cycletls
+module github.com/Vampire111/CycleTLS/cycletls
 
 go 1.14
 
